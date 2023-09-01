@@ -129,7 +129,7 @@
                 return this.vocab_list.filter((vocab) => parseInt((vocab.grasp * 100).toFixed(0)) >= this.min_grasp)
             },
 
-            tatoeba_search() {
+            tatoeba_search(vocab) {
                 const url = new URL("https://tatoeba.org/en/sentences/search");
 
                 url.searchParams.append("from", "jpn")
@@ -149,6 +149,11 @@
                 url.searchParams.append("sort_reverse", "")
                 url.searchParams.append("trans_filter", "limit")
 
+                if (vocab) {
+                    url.searchParams.append("query", '"' + vocab.spelling + '"')
+                    return url
+                }
+
                 let query = this.filtered_vocab().map(
                     (vocab) => `(@text "${vocab.spelling}" @transcription "${vocab.reading}")`)
                 query.sort(() => Math.random() - 0.5)
@@ -164,7 +169,6 @@
                 url.searchParams.append("query", with_query + " " + query)
 
                 return url
-
             },
 
             init() {
@@ -252,10 +256,10 @@
                     <label class="form-check-label" for="from_native">From Native</label>
                 </div>
 
-                <div class="search-bar mt-2">
+                <!-- <div class="search-bar mt-2">
                     <input type="text" x-model="with_query" class="form-control"
                         placeholder="Show Phrases Containing...">
-                </div>
+                </div> -->
             </div>
 
             <div class="col">
@@ -299,14 +303,15 @@
                                 </ruby>
                                 <p class="fs-4 align-middle" x-text="`${parseInt((vocab.grasp * 100).toFixed(0))}%`">
                                 </p>
-                                <button class="btn btn-outline-secondary mx-auto w-50 btn-sm" @click="
+                                <!-- <button class="btn btn-outline-secondary mx-auto w-50 btn-sm" @click="
                                     if (with_query.includes(vocab.spelling)) {
                                         with_query = with_query.replace(vocab.spelling, '').replace('  ', ' ').trim()
                                     } else {
                                         with_query += (with_query && ' ') + vocab.spelling
                                     }
                                 " x-text="with_query.includes(vocab.spelling) ? 'Remove' : 'Add'">
-                                </button>
+                                </button> -->
+                                <a class="link-secondary" :href="tatoeba_search(vocab)">On Tatoeba</a>
                             </div>
                         </div>
                     </div>
